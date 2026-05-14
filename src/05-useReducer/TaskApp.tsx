@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 
 import { Plus, Trash2, Check } from 'lucide-react';
 
@@ -7,53 +7,37 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-interface Todo {
-  id: number;
-  text: string;
-  completed: boolean;
-}
+import { getTasksInitialState, tasksReducer } from './reducer/tasksReducer';
 
 export const TaskApp = () => {
-  const [todos, setTodos] = useState<Todo[]>([]);
+  // setInputValue is aka a dispatcher function
   const [inputValue, setInputValue] = useState('');
+  // const [todos, setTodos] = useState<Todo[]>([]);
+
+  // We need to send the reducer function and the initial value
+  const [state, dispatcher] = useReducer(tasksReducer, getTasksInitialState());
+
+  const todos = state.todos;
+
+  useEffect(() => {
+    localStorage.setItem('tasksstates', JSON.stringify(state));
+  }, [state]);
+
 
   const addTodo = () => {
     if (inputValue.length === 0) return;
 
-    // This is not an instance, this tells only how it looks the object
-    const newToDo: Todo = {
-      id: Date.now(),
-      text: inputValue.trim(),
-      completed: false
-    };
-
-    // We can do this but is not recommended because react won't know
-    // that we made a change
-    // todos.push(newToDo);
-
-    setTodos([...todos, newToDo]);
+    dispatcher({ type: 'ADD_TODO', payload: inputValue });
 
     setInputValue('');
-
   };
 
   const toggleTodo = (id: number) => {
-    const updatedTodos = todos.map(todo => {
-      if (todo.id === id) {
-        return { ...todo, completed: !todo.completed };
-      }
-      return todo;
-    });
-
-    setTodos(updatedTodos);
-
+    dispatcher({ type: 'TOGGLE_TODO', payload: id });
   };
 
   const deleteTodo = (id: number) => {
-    const updatedTodos = todos.filter((todo) => todo.id !== id);
-
-    setTodos(updatedTodos);
-
+    dispatcher({ type: 'DELETE_TODO', payload: id });
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
