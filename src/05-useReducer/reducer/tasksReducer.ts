@@ -1,3 +1,5 @@
+import * as z from "zod/v4";
+
 interface Todo {
   id: number;
   text: string;
@@ -18,6 +20,20 @@ export type TaskAction =
   | { type: 'TOGGLE_TODO', payload: number }
   | { type: 'DELETE_TODO', payload: number };
 
+// Schemes created for using zod
+const TodoSchema = z.object({
+  id: z.number(),
+  text: z.string(),
+  completed: z.boolean()
+})
+
+const TaskStateScheme = z.object({
+  todos: z.array(TodoSchema),
+  length: z.number(),
+  completed: z.number(),
+  pending: z.number(),
+})
+
 export const getTasksInitialState = (): TaskState => {
 
   const localStorageState = localStorage.getItem('tasksstates')
@@ -31,7 +47,33 @@ export const getTasksInitialState = (): TaskState => {
     }
   }
 
-  return JSON.parse(localStorageState);
+  let parsedState: any;
+  try {
+    parsedState = JSON.parse(localStorageState);
+  } catch (error) {
+    console.error("Error parsing localStorageState as JSON:", error);
+    return {
+      todos: [],
+      length: 0,
+      completed: 0,
+      pending: 0
+    };
+  }
+
+  // Validate with Zod after successful JSON parsing
+  const result = TaskStateScheme.safeParse(parsedState);
+
+  if (!result.success) {
+    console.error("Error validating parsed state with Zod:", result.error);
+    return {
+      todos: [],
+      length: 0,
+      completed: 0,
+      pending: 0
+    }
+  }
+
+  return result.data;
 }
 
 // A reducer is a pure function, it receives a state and and action and we return a new state.
