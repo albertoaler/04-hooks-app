@@ -2,7 +2,7 @@
 // Es necesario componentes de Shadcn/ui
 // https://ui.shadcn.com/docs/installation/vite
 
-import React, { useReducer } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -28,40 +28,30 @@ export const ScrambleWords = () => {
     totalWords
   } = state;
 
+  useEffect(() => {
+    if (points === 0) return;
+
+    confetti({
+      particleCount: 100,
+      spread: 120,
+      origin: { y: 0.6 }
+    });
+  }, [points]);
+
   const handleGuessSubmit = (e: React.FormEvent) => {
     // Previene el refresh de la página
     e.preventDefault();
     dispatch({
       type: 'CHECK_ANSWER'
     });
-
-    // confetti({
-    //   particleCount: 100,
-    //   spread: 120,
-    //   origin: { y: 0.6 }
-    // }
   };
 
   const handleSkip = () => {
-    // setSkipCounter(prev => prev + 1);
-
-    // const newWords = words.slice(1);
-    // setWords(newWords);
-    // setCurrentWord(newWords[0]);
-    // setScrambledWord(scrambleWord(newWords[0]));
-    // setGuess('');
+    dispatch({ type: 'SKIP_WORD' });
   };
 
   const handlePlayAgain = () => {
-
-    // const newShuffledWords = shuffleArray(GAME_WORDS);
-    // setWords(newShuffledWords);
-    // setCurrentWord(newShuffledWords[0]);
-    // setScrambledWord(scrambleWord(newShuffledWords[0]));
-    // setPoints(0);
-    // setErrorCounter(0);
-    // setSkipCounter(0);
-    // setIsGameOver(false);
+    dispatch({ type: 'START_NEW_GAME', payload: getInitialState() });
   };
 
   //! Si ya no hay palabras para jugar, se muestra el mensaje de fin de juego
