@@ -3,6 +3,7 @@ import { AboutPage } from "../pages/about/AboutPage";
 import { ProfilePage } from "../pages/profile/ProfilePage";
 import { LoginPage } from "../pages/auth/LoginPage";
 import { PrivateRoute } from "./PrivateRoute";
+import { PublicRoute } from "./PublicRoute";
 
 export const appRouter = createBrowserRouter([
   {
@@ -15,11 +16,12 @@ export const appRouter = createBrowserRouter([
   },
   {
     path: "/login",
-    element: <LoginPage />,
+    element: <PublicRoute element={<LoginPage />} />,
   },
   {
     path: '*',
     element: <Navigate to='/' />
   }
 ]);
+
 

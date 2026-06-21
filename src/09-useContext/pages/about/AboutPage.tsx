@@ -14,7 +14,7 @@ export const AboutPage = () => {
 
         {/* Perfil de Usuario si tiene sesión*/}
         {isAuthenticated &&
-          <Link to="/profile" className="hover:text-blue-500 underline text-2xl">Perfil</Link>
+          <Link to="/profile" className="hover:text-blue-500 self-center underline text-2xl">Perfil</Link>
         }
 
         {/* Login - Logout */}
@@ -22,7 +22,7 @@ export const AboutPage = () => {
           <Button variant={'destructive'}
             onClick={logout}
           >
-            Salir
+            Cerrar sesión
           </Button>
         ) : (
           <Link to="/login" className="hover:text-blue-500 underline text-2xl">Iniciar Sesión</Link>
