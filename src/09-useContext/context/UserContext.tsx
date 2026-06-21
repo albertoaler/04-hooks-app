@@ -1,4 +1,4 @@
-import { createContext, useState, type PropsWithChildren } from "react";
+import { createContext, useEffect, useState, type PropsWithChildren } from "react";
 import { users, type User } from "../data/user-mock.data";
 
 // interface UserContextProps {
@@ -10,6 +10,7 @@ type AuthStatus = 'checking' | 'authenticated' | 'not-authenticated';
 interface UserContextProps {
   //state
   authStatus: AuthStatus;
+  isAuthenticated: boolean;
   user: User | null;
 
   //methods
@@ -43,19 +44,32 @@ export const UserContextProvider = ({ children }: PropsWithChildren) => {
 
     setUser(user);
     setAuthStatus('authenticated');
+    localStorage.setItem('userId', userID.toString());
     return true;
   };
 
   const handleLogout = () => {
     setAuthStatus('not-authenticated');
     setUser(null);
+    localStorage.removeItem('userId');
   };
+
+  useEffect(() => {
+    const storedUserID = localStorage.getItem('userId');
+    if (storedUserID) {
+      handleLogin(+storedUserID);
+      return;
+    } else {
+      handleLogout();
+    }
+  });
 
   // It is not recommended to return html from a Provider
   return (
     // With React 19+ it is not necessary to put '.Provider'
     <UserContext.Provider value={{
       authStatus: authStatus,
+      isAuthenticated: authStatus === 'authenticated',
       user: user,
       login: handleLogin,
       logout: handleLogout
